@@ -16,6 +16,13 @@ h1 {
     padding: 10px;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+		position: absolute;
+		inset:10px;
+		top:calc(var(--top-bar-height) + 80px);
+		right: auto;
+		width: 400px;
+		border-radius: 30px;
+		border: 1px solid #494949;
 }
 
 .control-panel label {
@@ -40,19 +47,25 @@ h1 {
     width: 300px;
     background-color: #fff;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    overflow-y: auto;
-    margin-right: 20px;
+		position: absolute;
+		right: 0;
+		top: calc(var(--top-bar-height) + 30px);
+		bottom: 20px;
+		overflow: hidden;
 }
 
 .sidebar h2 {
     padding: 20px;
     margin: 0;
+		line-height: 40px;
     background-color: #f8f8f8;
     border-bottom: 1px solid #e0e0e0;
 }
 
 .interaction-log {
     padding: 20px;
+		overflow-y: auto;
+		height: calc(100% - 41px);
 }
 
 .interaction-item {
@@ -71,13 +84,10 @@ h1 {
 
 #map-container {
     flex-grow: 1;
-    height: 100%;
-    width: 100%;
-}
-
-.leaflet-container {
-    height: 100% !important;
-    width: 100% !important;
+		position: absolute;
+		inset: 0;
+		top:var(--top-bar-height);
+		z-index: -1
 }
 
 .leaflet-popup-content-wrapper {
