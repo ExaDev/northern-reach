@@ -14,13 +14,20 @@
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"
+        integrity="sha512-OFs3W4DIZ5ZkrDhBFtsCP6JXtMEDGmhl0QPlmWYBJay40TT1n3gt2Xuw8Pf/iezgW9CdabjkNChRqozl/YADmg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css"
+            integrity="sha512-fYyZwU1wU0QWB4Yutd/Pvhy5J1oWAwFXun1pt+Bps04WSe4Aq6tyHlT4+MHSJhD8JlLfgLuC4CbCnX5KHSjyCg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css" />
+    <script src="{{ url_for('static', filename='lightpicker.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lightpicker.css') }}" />
     <style>
         body {
             margin: 0;
@@ -34,6 +41,7 @@
             display: flex;
             align-items: center;
             padding: 0 20px;
+            box-shadow: 0 0px 2px rgba(0, 0, 0, 0.614);
         }
 
         .logo {
@@ -47,7 +55,6 @@
         .control-panel {
             background-color: #fff;
             padding: 10px;
-            text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             position: absolute;
             top: calc(var(--top-bar-height) + 80px);
@@ -64,41 +71,29 @@
         }
 
         .control-group {
-
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #e6e6e6;
+            padding: 20px 10px 10px;
+            position: relative;
         }
 
         .control-group label {
-            width: 100px;
-            margin-right: 10px;
-            text-align: right;
+            position: absolute;
+            padding: 0 5px;
+            background-color: #fff;
+            top: -10px;
+            left: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #757575;
         }
 
-        .control-group .input-group {
-            display: flex;
-            flex-grow: 1;
-            align-items: center;
-        }
 
-        .control-group input[type="date"],
-        .control-group select {
-            flex-grow: 1;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-        }
-
-        .control-group input[type="date"] {
-            width: calc(50% - 5px);
-        }
-
-        .control-group input[type="date"]:first-of-type {
-            margin-right: 10px;
-        }
 
         #date-range-display {
             margin-left: 10px;
             font-weight: bold;
+            display: none;
         }
 
         .toggle-group {
@@ -114,6 +109,20 @@
         .toggle-group input[type="checkbox"] {
             margin-right: 5px;
         }
+
+        .datePicker {
+            width: 100%;
+            padding: 5px 10px;
+            line-height: 20px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .flex-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
     </style>
 </head>
 
@@ -125,7 +134,8 @@
         <div class="control-panel">
             <div class="control-group">
                 <label for="start-date">Date Range:</label>
-                <input id="litepicker" />
+                <div class="flex-row"><input id="litepicker" class="datePicker" /><input id="litepicker2"
+                        class="datePicker" /></div>
                 <input type="hidden" id="start-date" name="start-date">
                 <input type="hidden" id="end-date" name="end-date">
                 <span id="date-range-display"></span>
@@ -173,8 +183,11 @@
         window.onload = function () {
             const picker = new Litepicker({
                 element: document.getElementById('litepicker'),
+                elementEnd: document.getElementById('litepicker2'),
                 startDate: new Date(),
                 singleMode: false,
+                numberOfMonths: 2,
+                numberOfColumns: 2,
                 setup: (picker) => {
                     picker.on('selected', (date1, date2) => {
                         console.log(date1, date2);
