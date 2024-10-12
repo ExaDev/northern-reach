@@ -182,6 +182,7 @@ body {
 }
 .control-panel .button img{
 	margin-right: 3px;
+	transition: transform 0.3s;
 }
 .control-panel.close .button img{
 	transform: rotate(180deg);
