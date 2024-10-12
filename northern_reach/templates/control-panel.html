@@ -1,4 +1,7 @@
-<div class="control-panel">
+<div class="control-panel" id="control-panel">
+	<button class="button" onclick="toggleControlPanel()">
+		<img src="{{ url_for('static', filename='images/arrow.png') }}" alt="Arrow Icon" class="arrow">
+	</button>
 	<div class="control-group">
 		<label for="start-date">Date Range:</label>
 		<div class="flex-row"><input id="litepicker" class="datePicker" /><input id="litepicker2" class="datePicker" />
@@ -27,3 +30,12 @@
 		<label><input type="checkbox" id="toggle-heatmap" checked> Show Heatmap</label>
 	</div>
 </div>
+
+<script>
+	
+	function toggleControlPanel() {
+		console.log('toggling control panel');
+		const controlPanel = document.querySelector('#control-panel');
+		controlPanel.classList.toggle('close');
+	};
+</script>
