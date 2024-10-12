@@ -207,3 +207,57 @@ body {
             align-items: center;
             gap: 10px;
         }
+.pill{
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+.pill span{
+	display: inline-block;
+	padding: 5px 10px;
+	background-color: #0066cc;
+	color: #fff;
+}
+.pill span.leftSide{
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+.pill span.rightSide{
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+.pill span.webinar{
+	background-color: #512da8;
+}
+.pill span.emailcorrespondence{
+	background-color: #607d8b;
+}
+.pill span.workshop{
+	background-color: #388e3c;
+}
+.pill span.networkingevent{
+	background-color: #ffc107;
+	color: #000;
+}
+.pill span.conversation{
+	background-color: #e91e63;
+}
+
+.pill span.softwareengineering{
+	background-color: #512da8;
+}
+.pill span.healthcare{
+	background-color: #607d8b;
+}
+.pill span.finance{
+	background-color: #388e3c;
+}
+.pill span.b2bmarketing{
+	background-color: #ffc107;
+}
+.pill span.education{
+	background-color: #e91e63;
+}
+.pill span.datascience{
+	background-color: #f57c00;
+}

@@ -91,6 +91,9 @@
 			interactionFilter.appendChild(option);
 		});
 
+		console.log(interactionTypes.map(interaction => interaction.split(' ').join('').toLowerCase().replace('-', '')));
+		console.log(sectors.map(sector => sector.split(' ').join('').toLowerCase().replace('-', '')));
+
 		// Set initial date range
 		const dates = markerData.map(data => new Date(data.date));
 		const minDate = new Date(Math.min.apply(null, dates));

@@ -21,6 +21,12 @@ def map_view():
     # Prepare marker data
     marker_data = []
     for index, row in df.iterrows():
+        sectorClass = "".join(row['Sector'].split()).lower().replace('-', '')
+        # remove digits from sectorClass
+        sectorClass = ''.join([i for i in sectorClass if not i.isdigit()])
+        interactionClass = "".join(row['Interaction'].split()).lower().replace('-', '')
+        # remove digits from interactionClass
+        interactionClass = ''.join([i for i in interactionClass if not i.isdigit()])
         popup_text = f"""
         <b>Date:</b> {row['Date']}<br>
         <b>Postcode:</b> {row['Postcode']}<br>
@@ -29,6 +35,10 @@ def map_view():
         <b>Last Name:</b> {row['Last Name']}<br>
         <b>Interaction:</b> {row['Interaction']}<br>
         <b>Sector:</b> {row['Sector']}
+        <div class="pill">
+        <span class="leftSide {sectorClass}">{row['Sector']}</span>
+        <span class="rightSide {interactionClass}">{row['Interaction']}</span>
+        </div>
         """
         marker_data.append({
             'lat': row['Latitude'],
