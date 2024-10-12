@@ -1,0 +1,29 @@
+<div class="control-panel">
+	<div class="control-group">
+		<label for="start-date">Date Range:</label>
+		<div class="flex-row"><input id="litepicker" class="datePicker" /><input id="litepicker2" class="datePicker" />
+		</div>
+		<input type="hidden" id="start-date" name="start-date">
+		<input type="hidden" id="end-date" name="end-date">
+		<span id="date-range-display"></span>
+
+	</div>
+	<div class="control-group">
+		<label for="sector-filter">Sector:</label>
+		<select id="sector-filter">
+			<option value="all">All Sectors</option>
+			<!-- Sector options will be dynamically added here -->
+		</select>
+	</div>
+	<div class="control-group">
+		<label for="interaction-filter">Interaction:</label>
+		<select id="interaction-filter">
+			<option value="all">All Interactions</option>
+			<!-- Interaction options will be dynamically added here -->
+		</select>
+	</div>
+	<div class="toggle-group">
+		<label><input type="checkbox" id="toggle-markers" checked> Show Markers</label>
+		<label><input type="checkbox" id="toggle-heatmap" checked> Show Heatmap</label>
+	</div>
+</div>
