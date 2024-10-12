@@ -163,6 +163,7 @@
 
         <div class="sidebar">
             <h2>Interaction Log</h2>
+            {% include 'test.html' %}
             <div class="interaction-log" id="interaction-log">
                 {% for interaction in interactions %}
                 <div class="interaction-item" data-date="{{ interaction['Date'] }}"
@@ -206,6 +207,13 @@
         let map, heatLayer, markerLayer, markers = [];
         var filterInteractions;
 
+        const markerIcon = L.icon({
+            iconUrl: '{{ url_for('static', filename='images/marker.png') }}',
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
+            popupAnchor: [7, 14],
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
             const startDate = document.getElementById('start-date');
             const endDate = document.getElementById('end-date');
@@ -221,9 +229,6 @@
             map = L.map('map-container', {
                 zoomControl: false,
             }).setView([54, -2], 6);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
 
             // Add heatmap layer
             const heatData = markerData.map(data => [data.lat, data.lon, 1]);
@@ -246,12 +251,24 @@
                 position: 'bottomleft'
             }).addTo(map);
 
+            var CartoDB_PositronNoLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+            var Stadia_StamenTerrainLabels = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain_labels/{z}/{x}/{y}{r}.{ext}', {
+                minZoom: 0,
+                maxZoom: 18,
+                attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                ext: 'png'
+            }).addTo(map);
+
             // Add marker layer
             markerLayer = L.layerGroup().addTo(map);
 
             // Add markers to the marker layer
             markerData.forEach(data => {
-                const marker = L.marker([data.lat, data.lon])
+                const marker = L.marker([data.lat, data.lon], {icon: markerIcon})
                     .bindPopup(data.popup);
                 markerLayer.addLayer(marker);
                 markers.push({ marker: marker, date: new Date(data.date), sector: data.sector, interaction: data.interaction });
