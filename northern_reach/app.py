@@ -27,14 +27,19 @@ def map_view():
         interactionClass = "".join(row['Interaction'].split()).lower().replace('-', '')
         # remove digits from interactionClass
         interactionClass = ''.join([i for i in interactionClass if not i.isdigit()])
+        #convert date to string
+        interaction_date = row['Date']
+        #this is weird for some reason and breaks when refreshing the page
+        try:
+            date = datetime.strptime(interaction_date, '%Y-%m-%d').strftime('%d %b %y')
+        except:
+            date = interaction_date
         popup_text = f"""
-        <b>Date:</b> {row['Date']}<br>
-        <b>Postcode:</b> {row['Postcode']}<br>
-        <b>Email:</b> {row['Email']}<br>
-        <b>First Name:</b> {row['First Name']}<br>
-        <b>Last Name:</b> {row['Last Name']}<br>
-        <b>Interaction:</b> {row['Interaction']}<br>
-        <b>Sector:</b> {row['Sector']}
+        <div class="text-content">
+        <h2>{row['First Name']} {row['Last Name']} <span>{date}</span></h2>
+        <p><a href="mailto:{row['Email']}">{row['Email']}</a></p>
+        <p>Postcode: {row['Postcode']}</p>
+        </div>
         <div class="pill">
         <span class="leftSide {sectorClass}">{row['Sector']}</span>
         <span class="rightSide {interactionClass}">{row['Interaction']}</span>
