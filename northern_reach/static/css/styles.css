@@ -14,7 +14,6 @@ h1 {
 .control-panel {
 	background-color: #fff;
 	padding: 10px;
-	text-align: center;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 	position: absolute;
 	inset: 10px;
@@ -189,21 +188,23 @@ body {
 }
 
 .control-group {
-	margin-bottom: 10px;
-	border: 1px solid #e6e6e6;
-	padding: 20px 10px 10px;
+	padding: 10px 0;
 	position: relative;
 }
 
 .control-group label {
-	position: absolute;
-	padding: 0 5px;
-	background-color: #fff;
-	top: -10px;
-	left: 10px;
-	font-size: 14px;
-	font-weight: bold;
+	text-align: left;
+	font-size: 16px;
+	padding-bottom: 10px;
 	color: #757575;
+}
+.control-group p {
+	margin: 0;
+	color: #A5A5A5;
+	font-size: 12px;
+}
+.control-group .flex-row{
+	gap: 10px;
 }
 
 #date-range-display {
@@ -227,7 +228,6 @@ body {
 }
 
 .datePicker {
-	width: 100%;
 	padding: 5px 10px;
 	line-height: 20px;
 	border: 1px solid #ccc;
