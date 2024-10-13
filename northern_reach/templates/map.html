@@ -1,0 +1,168 @@
+<div id="map-container"></div>
+
+<script>
+
+	const markerData = {{ marker_data| safe }};
+	let map, heatLayer, markerLayer, markers = [];
+	var filterInteractions;
+
+	const markerIcon = L.icon({
+		iconUrl: '{{ url_for('static', filename='images/marker.png') }}',
+		iconSize: [14, 14],
+		iconAnchor: [7, 7],
+		popupAnchor: [0, 0],
+	});
+
+	document.addEventListener('DOMContentLoaded', function () {
+		const startDate = document.getElementById('start-date');
+		const endDate = document.getElementById('end-date');
+		const dateRangeDisplay = document.getElementById('date-range-display');
+		const interactionLog = document.getElementById('interaction-log');
+		const interactions = interactionLog.getElementsByClassName('interaction-item');
+		const toggleMarkers = document.getElementById('toggle-markers');
+		const toggleHeatmap = document.getElementById('toggle-heatmap');
+		const sectorFilter = document.getElementById('sector-filter');
+		const interactionFilter = document.getElementById('interaction-filter');
+
+		// Initialize the map
+		map = L.map('map-container', {
+			zoomControl: false,
+		}).setView([54, -2], 6);
+
+		// Add heatmap layer
+		const heatData = markerData.map(data => [data.lat, data.lon, 1]);
+		heatLayer = L.heatLayer(heatData, {
+			radius: 25,
+			blur: 15,
+			maxZoom: 17,
+			max: 1.0,
+			minOpacity: 0.3,
+			gradient: {
+				0.4: 'blue',
+				0.6: 'cyan',
+				0.7: 'lime',
+				0.8: 'yellow',
+				1.0: 'red'
+			}
+		}).addTo(map);
+
+		L.control.zoom({
+			position: 'bottomleft'
+		}).addTo(map);
+
+		var CartoDB_PositronNoLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+			subdomains: 'abcd',
+			maxZoom: 20
+		}).addTo(map);
+		var Stadia_StamenTerrainLabels = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain_labels/{z}/{x}/{y}{r}.{ext}', {
+			minZoom: 0,
+			maxZoom: 18,
+			attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+			ext: 'png'
+		}).addTo(map);
+
+		// Add marker layer
+		markerLayer = L.layerGroup().addTo(map);
+
+		// Add markers to the marker layer
+		markerData.forEach(data => {
+			const marker = L.marker([data.lat, data.lon], { icon: markerIcon })
+				.bindPopup(data.popup);
+			markerLayer.addLayer(marker);
+			markers.push({ marker: marker, date: new Date(data.date), sector: data.sector, interaction: data.interaction });
+		});
+
+		// Populate sector filter options
+		const sectors = [...new Set(markerData.map(data => data.sector))];
+		sectors.forEach(sector => {
+			const option = document.createElement('option');
+			option.value = sector;
+			option.textContent = sector;
+			sectorFilter.appendChild(option);
+		});
+
+		// Populate interaction filter options
+		const interactionTypes = [...new Set(markerData.map(data => data.interaction))];
+		interactionTypes.forEach(interaction => {
+			const option = document.createElement('option');
+			option.value = interaction;
+			option.textContent = interaction;
+			interactionFilter.appendChild(option);
+		});
+
+		console.log(interactionTypes.map(interaction => interaction.split(' ').join('').toLowerCase().replace('-', '')));
+		console.log(sectors.map(sector => sector.split(' ').join('').toLowerCase().replace('-', '')));
+
+		// Set initial date range
+		const dates = markerData.map(data => new Date(data.date));
+		const minDate = new Date(Math.min.apply(null, dates));
+		const maxDate = new Date(Math.max.apply(null, dates));
+
+		startDate.value = minDate.toISOString().split('T')[0];
+		endDate.value = maxDate.toISOString().split('T')[0];
+		startDate.min = startDate.value;
+		endDate.max = endDate.value;
+
+		updateDateRangeDisplay();
+
+		function updateDateRangeDisplay() {
+			dateRangeDisplay.textContent = `${moment(startDate.value).format('MMM D, YYYY')} - ${moment(endDate.value).format('MMM D, YYYY')}`;
+		}
+
+		filterInteractions = () => {
+			const start = new Date(startDate.value);
+			const end = new Date(endDate.value);
+			const selectedSector = sectorFilter.value;
+			const selectedInteraction = interactionFilter.value;
+
+			Array.from(interactions).forEach(item => {
+				const itemDate = new Date(item.dataset.date);
+				const itemSector = item.dataset.sector;
+				const itemInteraction = item.dataset.interaction;
+				if (itemDate >= start && itemDate <= end &&
+					(selectedSector === 'all' || itemSector === selectedSector) &&
+					(selectedInteraction === 'all' || itemInteraction === selectedInteraction)) {
+					item.style.display = '';
+				} else {
+					item.style.display = 'none';
+				}
+			});
+
+			markerLayer.clearLayers();
+			const filteredHeatData = [];
+			markers.forEach(({ marker, date, sector, interaction }) => {
+				if (date >= start && date <= end &&
+					(selectedSector === 'all' || sector === selectedSector) &&
+					(selectedInteraction === 'all' || interaction === selectedInteraction)) {
+					markerLayer.addLayer(marker);
+					filteredHeatData.push([marker.getLatLng().lat, marker.getLatLng().lng, 1]);
+				}
+			});
+			heatLayer.setLatLngs(filteredHeatData);
+		}
+
+		startDate.addEventListener('change', filterInteractions);
+		endDate.addEventListener('change', filterInteractions);
+		sectorFilter.addEventListener('change', filterInteractions);
+		interactionFilter.addEventListener('change', filterInteractions);
+
+		toggleMarkers.addEventListener('change', function () {
+			if (this.checked) {
+				map.addLayer(markerLayer);
+			} else {
+				map.removeLayer(markerLayer);
+			}
+		});
+
+		toggleHeatmap.addEventListener('change', function () {
+			if (this.checked) {
+				map.addLayer(heatLayer);
+			} else {
+				map.removeLayer(heatLayer);
+			}
+		});
+
+		filterInteractions();
+	});
+</script>

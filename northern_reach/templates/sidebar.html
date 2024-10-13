@@ -1,0 +1,14 @@
+<div class="sidebar">
+	<h2>Interaction Log</h2>
+	<div class="interaction-log" id="interaction-log">
+		{% for interaction in interactions %}
+		<div class="interaction-item" data-date="{{ interaction['Date'] }}" data-sector="{{ interaction['Sector'] }}"
+			data-interaction="{{ interaction['Interaction'] }}">
+			<p><strong>Date:</strong> {{ interaction['Date'] }}</p>
+			<p><strong>Name:</strong> {{ interaction['First Name'] }} {{ interaction['Last Name'] }}</p>
+			<p><strong>Interaction:</strong> {{ interaction['Interaction'] }}</p>
+			<p><strong>Sector:</strong> {{ interaction['Sector'] }}</p>
+		</div>
+		{% endfor %}
+	</div>
+</div>
