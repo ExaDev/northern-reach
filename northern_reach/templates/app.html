@@ -98,17 +98,17 @@
                     </div>
                 </div>
                 <div class="control-group">
-                    <label for="sector-filter">Sector:</label>
-                    <select id="sector-filter">
-                        <option value="all">All Sectors</option>
-                        <!-- Sector options will be dynamically added here -->
+                    <label for="industry-filter">Industry:</label>
+                    <select id="industry-filter">
+                        <option value="all">All Industries</option>
+                        <!-- Industry options will be dynamically added here -->
                     </select>
                 </div>
                 <div class="control-group">
-                    <label for="interaction-filter">Interaction:</label>
-                    <select id="interaction-filter">
-                        <option value="all">All Interactions</option>
-                        <!-- Interaction options will be dynamically added here -->
+                    <label for="event-type-filter">Event Type:</label>
+                    <select id="event-type-filter">
+                        <option value="all">All Event Types</option>
+                        <!-- Event Type options will be dynamically added here -->
                     </select>
                 </div>
                 <div class="toggle-group">
@@ -121,11 +121,12 @@
                     <h2>Interaction Log</h2>
                     <div class="interaction-log" id="interaction-log">
                         {% for interaction in interactions %}
-                        <div class="interaction-item" data-date="{{ interaction['Date'] }}" data-sector="{{ interaction['Sector'] }}" data-interaction="{{ interaction['Interaction'] }}">
-                            <p><strong>Date:</strong> {{ interaction['Date'] }}</p>
-                            <p><strong>Name:</strong> {{ interaction['First Name'] }} {{ interaction['Last Name'] }}</p>
-                            <p><strong>Interaction:</strong> {{ interaction['Interaction'] }}</p>
-                            <p><strong>Sector:</strong> {{ interaction['Sector'] }}</p>
+                        <div class="interaction-item" data-date="{{ interaction['Date of Event'] }}" data-industry="{{ interaction['Industry'] }}" data-event-type="{{ interaction['Event Type'] }}">
+                            <p><strong>Date:</strong> {{ interaction['Date of Event'] }}</p>
+                            <p><strong>Business Name:</strong> {{ interaction['Business Name'] }}</p>
+                            <p><strong>Event Type:</strong> {{ interaction['Event Type'] }}</p>
+                            <p><strong>Industry:</strong> {{ interaction['Industry'] }}</p>
+                            <p><strong>Event Host:</strong> {{ interaction['Event Host'] }}</p>
                         </div>
                         {% endfor %}
                     </div>
@@ -146,13 +147,14 @@
                 const interactions = interactionLog.getElementsByClassName('interaction-item');
                 const toggleMarkers = document.getElementById('toggle-markers');
                 const toggleHeatmap = document.getElementById('toggle-heatmap');
-                const sectorFilter = document.getElementById('sector-filter');
-                const interactionFilter = document.getElementById('interaction-filter');
+                const industryFilter = document.getElementById('industry-filter');
+                const eventTypeFilter = document.getElementById('event-type-filter');
 
                 // Initialize the map
                 map = L.map('map-container').setView([54, -2], 6);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 19
                 }).addTo(map);
 
                 // Add heatmap layer
@@ -180,25 +182,25 @@
                     const marker = L.marker([data.lat, data.lon])
                         .bindPopup(data.popup);
                     markerLayer.addLayer(marker);
-                    markers.push({marker: marker, date: new Date(data.date), sector: data.sector, interaction: data.interaction});
+                    markers.push({marker: marker, date: new Date(data.date), industry: data.industry, event_type: data.event_type});
                 });
 
-                // Populate sector filter options
-                const sectors = [...new Set(markerData.map(data => data.sector))];
-                sectors.forEach(sector => {
+                // Populate industry filter options
+                const industries = [...new Set(markerData.map(data => data.industry))];
+                industries.forEach(industry => {
                     const option = document.createElement('option');
-                    option.value = sector;
-                    option.textContent = sector;
-                    sectorFilter.appendChild(option);
+                    option.value = industry;
+                    option.textContent = industry;
+                    industryFilter.appendChild(option);
                 });
 
-                // Populate interaction filter options
-                const interactionTypes = [...new Set(markerData.map(data => data.interaction))];
-                interactionTypes.forEach(interaction => {
+                // Populate event type filter options
+                const eventTypes = [...new Set(markerData.map(data => data.event_type))];
+                eventTypes.forEach(eventType => {
                     const option = document.createElement('option');
-                    option.value = interaction;
-                    option.textContent = interaction;
-                    interactionFilter.appendChild(option);
+                    option.value = eventType;
+                    option.textContent = eventType;
+                    eventTypeFilter.appendChild(option);
                 });
 
                 // Set initial date range
@@ -220,16 +222,16 @@
                 function filterInteractions() {
                     const start = new Date(startDate.value);
                     const end = new Date(endDate.value);
-                    const selectedSector = sectorFilter.value;
-                    const selectedInteraction = interactionFilter.value;
+                    const selectedIndustry = industryFilter.value;
+                    const selectedEventType = eventTypeFilter.value;
 
                     Array.from(interactions).forEach(item => {
                         const itemDate = new Date(item.dataset.date);
-                        const itemSector = item.dataset.sector;
-                        const itemInteraction = item.dataset.interaction;
+                        const itemIndustry = item.dataset.industry;
+                        const itemEventType = item.dataset.eventType;
                         if (itemDate >= start && itemDate <= end &&
-                            (selectedSector === 'all' || itemSector === selectedSector) &&
-                            (selectedInteraction === 'all' || itemInteraction === selectedInteraction)) {
+                            (selectedIndustry === 'all' || itemIndustry === selectedIndustry) &&
+                            (selectedEventType === 'all' || itemEventType === selectedEventType)) {
                             item.style.display = '';
                         } else {
                             item.style.display = 'none';
@@ -238,10 +240,10 @@
 
                     markerLayer.clearLayers();
                     const filteredHeatData = [];
-                    markers.forEach(({marker, date, sector, interaction}) => {
+                    markers.forEach(({marker, date, industry, event_type}) => {
                         if (date >= start && date <= end &&
-                            (selectedSector === 'all' || sector === selectedSector) &&
-                            (selectedInteraction === 'all' || interaction === selectedInteraction)) {
+                            (selectedIndustry === 'all' || industry === selectedIndustry) &&
+                            (selectedEventType === 'all' || event_type === selectedEventType)) {
                             markerLayer.addLayer(marker);
                             filteredHeatData.push([marker.getLatLng().lat, marker.getLatLng().lng, 1]);
                         }
@@ -251,8 +253,8 @@
 
                 startDate.addEventListener('change', filterInteractions);
                 endDate.addEventListener('change', filterInteractions);
-                sectorFilter.addEventListener('change', filterInteractions);
-                interactionFilter.addEventListener('change', filterInteractions);
+                industryFilter.addEventListener('change', filterInteractions);
+                eventTypeFilter.addEventListener('change', filterInteractions);
 
                 toggleMarkers.addEventListener('change', function() {
                     if (this.checked) {
@@ -271,6 +273,10 @@
                 });
 
                 filterInteractions();
+
+                // Ensure attribution control is visible
+                map.attributionControl.setPrefix(''); // This removes the default Leaflet attribution
+                map.attributionControl.addAttribution('© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors');
             });
         </script>
     </body>
