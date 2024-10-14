@@ -28,8 +28,10 @@ def read_excel(fn):
     return df
 
 def read_google_sheet(sheet_id):
-    url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv'
-    df = pd.read_csv(url)
+    url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx'
+    df = df = pd.read_excel(url, sheet_name='Tracker', usecols='A:H', header=0)
+
+    print(df)
 
     # Coalesce the two postcode columns
     df['Postcode'] = df['Postcode of Event'].fillna(df['Postcode of Working Location'])

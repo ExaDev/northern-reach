@@ -2,6 +2,7 @@ from flask import Flask, render_template
 import pandas as pd  # Assuming you're using pandas for your DataFrame
 import json
 from datetime import datetime
+import os
 
 from northern_reach.data import read_google_sheet
 
@@ -16,7 +17,7 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 # Load your data
 # Replace this with your actual data loading method
-df = read_google_sheet('sheet_id')
+df = read_google_sheet(os.environ.get('GOOGLE_SHEET_ID'))
 
 @app.route("/")
 def map_view():
